@@ -1,0 +1,50 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Dev",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/odoo/src/18.0/community/odoo-bin",
+            "console": "integratedTerminal",
+            "args": [
+                "-c",
+                "/odoo/etc/artec_project.cfg",
+                "-u",
+                "artec_collect"
+            ]
+        },
+        {
+            "name": "Python: Init",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/odoo/src/18.0/community/odoo-bin",
+            "console": "integratedTerminal",
+            "args": [
+                "-c",
+                "/odoo/etc/artec_project.cfg",
+                "-d",
+                "artec_project_db",
+                "-i",
+                "all",
+                "--without-demo",
+                "all",
+                "-s",
+                "--stop-after-init",
+                "--addons-path=/odoo/src/18.0/community/addons,/odoo/src/18.0/community/odoo/addons,/odoo/project/ArtecProject/code/customer_odoo_apps"
+            ]
+        },
+        {
+            "name": "Python: Shell",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/odoo/src/18.0/community/odoo-bin",
+            "console": "integratedTerminal",
+            "args": [
+                "shell",
+                "-c",
+                "/odoo/etc/artec_project.cfg"
+            ]
+        }
+    ]
+}
