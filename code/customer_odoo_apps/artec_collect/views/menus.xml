@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="artec_collect_menu" name="Artec Collect"/>
+    <menuitem id="artec_tank_menu" name="Tank" parent="artec_collect_menu" action="artec_tank_action"/>
+    <menuitem id="artec_product_menu" name="Product" parent="artec_collect_menu" action="artec_product_action"/>
+    <menuitem id="artec_strapping_menu" name="Strapping" parent="artec_collect_menu" action="artec_strapping_action"/>
+    <menuitem id="artec_gauging_menu" name="Gauging" parent="artec_collect_menu" action="artec_gauging_action"/>
+    <menuitem id="artec_astm_menu" name="Astm" parent="artec_collect_menu" action="artec_astm_action"/>
+
+</odoo>
