@@ -19,7 +19,7 @@ class ArtecAstm(models.Model):
     
     active = fields.Boolean(
         string='Active',
-        compute='_compute_active_status',
+        compute='_compute_active',
         store=True
     )
     
@@ -52,7 +52,7 @@ class ArtecAstm(models.Model):
                 raise ValidationError("End date is required when the ASTM is inactive.")
     
     @api.depends('start_date', 'end_date')
-    def _compute_active_status(self):
+    def _compute_active(self):
         for record in self:
             today = fields.Datetime.today()
             if (not record.end_date or (record.end_date and record.end_date > today)) and record.start_date and record.start_date <= today:
