@@ -4,9 +4,14 @@ from odoo.exceptions import ValidationError
 class ArtecStrapping(models.Model):
     _name="artec.strapping"
     
+    sequence = fields.Char(
+        string='Sequence'
+    )
+    
     name = fields.Char(
         string='Name',
-        required=True
+        copy=False,
+        compute='_compute_name',
     )
     
     tank_id = fields.Many2one(
@@ -32,7 +37,7 @@ class ArtecStrapping(models.Model):
     
     active = fields.Boolean(
         string='Active',
-        compute='_compute_active_status',
+        compute='_compute_active',
         store=True
     )
     
@@ -45,6 +50,19 @@ class ArtecStrapping(models.Model):
         default='draft'
     )
     
+    @api.model
+    def create(self, vals):
+        vals['sequence'] = self.env['ir.sequence'].next_by_code('artec.strapping')        
+        return super(ArtecStrapping, self).create(vals)
+    
+    @api.depends('tank_id', 'sequence')
+    def _compute_name(self):
+        for record in self:
+            if not record.tank_id or not record.sequence:
+                record.name = False
+                continue
+            record.name = f"{record.tank_id.name}_Strapping_{record.sequence}"
+    
     @api.constrains('start_date', 'end_date')
     def _check_end_date_after_start_date(self):
         for record in self:
@@ -53,15 +71,25 @@ class ArtecStrapping(models.Model):
                     raise ValidationError("End date must be greater than start date.")
     
     @api.constrains('end_date', 'active')
-    def _check_end_date_required(self):
+    def _check_end_date_required(self):        
         for record in self:
+            domain = [
+                ('tank_id', '=', record.tank_id.id),
+                ('id', '!=', record.id),
+            ]
+            all_strappings = self.with_context(active_test=False).search(domain)
+            after_strappings = all_strappings.filtered(lambda s: s.start_date > record.start_date)
+            
+            if after_strappings:
+                raise ValidationError("End date is required when there are strappings present after this start date")
+                
             if not record.active and not record.end_date:
                 raise ValidationError("End date is required when the strapping is inactive.")
     
     @api.depends('start_date', 'end_date')
-    def _compute_active_status(self):
+    def _compute_active(self):
         for record in self:
-            today = fields.Datetime.today()
+            today = fields.Datetime.now()
             if (not record.end_date or (record.end_date and record.end_date > today)) and record.start_date and record.start_date <= today:
                 record.active = True
             else:
@@ -70,7 +98,6 @@ class ArtecStrapping(models.Model):
     @api.constrains('start_date', 'end_date', 'tank_id')
     def _check_date_overlap(self):
         for record in self:
-            # Search for all strapping records for the same tank, excluding the current record
             domain = [
                 ('tank_id', '=', record.tank_id.id),
                 ('id', '!=', record.id),
