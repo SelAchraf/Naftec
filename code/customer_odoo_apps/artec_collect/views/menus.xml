@@ -7,5 +7,6 @@
     <menuitem id="artec_strapping_menu" name="Strapping" parent="artec_collect_menu" action="artec_strapping_action"/>
     <menuitem id="artec_gauging_menu" name="Gauging" parent="artec_collect_menu" action="artec_gauging_action"/>
     <menuitem id="artec_astm_menu" name="Astm" parent="artec_collect_menu" action="artec_astm_action"/>
+    <menuitem id="artec_expedition_menu" name="Expedition" parent="artec_collect_menu" action="artec_expedition_action"/>
 
 </odoo>

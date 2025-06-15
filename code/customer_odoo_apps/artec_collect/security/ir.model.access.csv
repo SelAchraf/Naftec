@@ -20,3 +20,6 @@ artec_astm_admin_access,access_artec_astm,model_artec_astm,group_admin,1,1,1,1
 artec_astm_line_user_access,access_artec_astm_line,model_artec_astm_line,group_user,1,0,0,0
 artec_astm_line_manager_access,access_artec_astm_line,model_artec_astm_line,group_manager,1,1,1,0
 artec_astm_line_admin_access,access_artec_astm_line,model_artec_astm_line,group_admin,1,1,1,1
+artec_expedition_user_access,access_artec_expedition,model_artec_expedition,group_user,1,0,0,0
+artec_expedition_manager_access,access_artec_expedition,model_artec_expedition,group_manager,1,1,1,0
+artec_expedition_admin_access,access_artec_expedition,model_artec_expedition,group_admin,1,1,1,1

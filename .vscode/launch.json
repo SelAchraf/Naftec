@@ -9,7 +9,7 @@
             "console": "integratedTerminal",
             "args": [
                 "-c",
-                "/odoo/etc/artec_project.cfg",
+                "/odoo/etc/naftec.cfg",
                 "-u",
                 "artec_collect"
             ]
@@ -22,16 +22,16 @@
             "console": "integratedTerminal",
             "args": [
                 "-c",
-                "/odoo/etc/artec_project.cfg",
+                "/odoo/etc/naftec.cfg",
                 "-d",
-                "artec_project_db",
+                "naftec_db",
                 "-i",
                 "all",
                 "--without-demo",
                 "all",
                 "-s",
                 "--stop-after-init",
-                "--addons-path=/odoo/src/18.0/community/addons,/odoo/src/18.0/community/odoo/addons,/odoo/project/ArtecProject/code/customer_odoo_apps"
+                "--addons-path=/odoo/src/18.0/community/addons,/odoo/src/18.0/community/odoo/addons,/odoo/project/Naftec/code/customer_odoo_apps"
             ]
         },
         {
@@ -43,7 +43,7 @@
             "args": [
                 "shell",
                 "-c",
-                "/odoo/etc/artec_project.cfg"
+                "/odoo/etc/naftec.cfg"
             ]
         }
     ]

@@ -5,26 +5,30 @@ class ArtecGauging(models.Model):
     _name="artec.gauging"
 
     name = fields.Char(
-        string='Name'
-    )
-    
-    time = fields.Datetime(
-        string='Time'
-    )
-    
-    depth = fields.Float(
-        string='Depth [m]'
-    )
-    
-    theoretical_volume = fields.Float(
-        compute='_compute_theoretical_volume',
-        string='Theoretical Volume [m3]',
+        string='Name',
+        compute = '_compute_name',
         store=True
     )
     
     tank_id = fields.Many2one(
         comodel_name='artec.tank',
         string='Tank',
+        required=True
+    )
+    
+    date = fields.Datetime(
+        string='Date',
+        required=True
+    )
+    
+    depth = fields.Float(
+        string='Depth [m]',
+    )
+    
+    theoretical_volume = fields.Float(
+        compute='_compute_theoretical_volume',
+        string='Theoretical Volume [m3]',
+        store=True
     )
     
     temperature = fields.Float(
@@ -41,19 +45,33 @@ class ArtecGauging(models.Model):
         store=True
     )
     
-    @api.depends('time','tank_id','depth')
+    volume = fields.Float(
+        string='Volume',
+        compute='_compute_volume',
+        store=True
+    )
+    
+    @api.depends('date','tank_id')
+    def _compute_name(self):
+        for record in self:
+            if not record.date or not record.tank_id:
+                record.name = False
+                continue
+            record.name = record.tank_id.name + '-' + str(record.date).replace(' ', '-')
+    
+    @api.depends('date','tank_id','depth')
     def _compute_theoretical_volume(self):
         for record in self:
-            if not record.time or not record.tank_id or not record.depth:
+            if not record.date or not record.tank_id or not record.depth:
                 record.theoretical_volume = 0.0
                 continue
             strapping = self.env['artec.strapping'].with_context(active_test=False).search([
                 ('tank_id', '=', record.tank_id.id),
-                ('start_date', '<=', record.time),
+                ('start_date', '<=', record.date),
                 ('state', '=', 'confirmed'),
                 '|',
                 ('end_date', '=', False),
-                ('end_date', '>', record.time)
+                ('end_date', '>', record.date)
             ])
             if strapping:
                 strapping_lines = strapping.strapping_line_ids
@@ -90,19 +108,19 @@ class ArtecGauging(models.Model):
                     "There is no strapping"
                 )
     
-    @api.depends('time', 'temperature', 'density')
+    @api.depends('date', 'temperature', 'density')
     def _compute_coefficient(self):
         for record in self:
-            if not record.time or not record.temperature or not record.density:
+            if not record.date or not record.temperature or not record.density:
                 record.coefficient = 0.0
                 continue
             
             astm = self.env['artec.astm'].with_context(active_test=False).search([
-                ('start_date', '<=', record.time),
+                ('start_date', '<=', record.date),
                 ('state', '=', 'confirmed'),
                 '|',
                 ('end_date', '=', False),
-                ('end_date', '>', record.time)
+                ('end_date', '>', record.date)
             ])
             if not astm:
                 raise ValidationError(
@@ -167,3 +185,11 @@ class ArtecGauging(models.Model):
                         C4 = ((C22-C21)/(Ds-Di))*(Dg-Di) + C21
 
                     record.coefficient = (C1+C2+C3+C4)/4
+                    
+    @api.depends('theoretical_volume', 'coefficient')
+    def _compute_volume(self):
+        for record in self:
+            if record.theoretical_volume==0 or record.coefficient==0:
+                record.volume = 0
+                continue
+            record.volume = record.theoretical_volume * record.coefficient
