@@ -1,21 +1,19 @@
-from odoo import fields, models
+from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 class ArtecAstmLine(models.Model):
     _name="artec.astm.line"
     
     temperature = fields.Float(
         string='Temperature [c°]',
-        required=True
     )
 
     density = fields.Float(
         string='Density [sg]',
-        required=True
     )
     
     coefficient = fields.Float(
         string='Coefficient',
-        required=True
     )
     
     astm_id = fields.Many2one(
@@ -28,3 +26,9 @@ class ArtecAstmLine(models.Model):
         'UNIQUE(temperature, density, astm_id)',
         'Duplicate temperature and density combination is not allowed within the same ASTM.')
     ]
+    
+    @api.constrains('coefficient')
+    def _check_coefficient_not_zero(self):
+        for record in self:
+            if record.coefficient == 0.0:
+                raise ValidationError("The coefficient must not be zero.")

@@ -62,8 +62,8 @@ class ArtecGauging(models.Model):
     @api.depends('date','tank_id','depth')
     def _compute_theoretical_volume(self):
         for record in self:
-            if not record.date or not record.tank_id or not record.depth:
-                record.theoretical_volume = 0.0
+            if not record.date or not record.tank_id:
+                record.theoretical_volume = 0
                 continue
             strapping = self.env['artec.strapping'].with_context(active_test=False).search([
                 ('tank_id', '=', record.tank_id.id),
@@ -111,8 +111,8 @@ class ArtecGauging(models.Model):
     @api.depends('date', 'temperature', 'density')
     def _compute_coefficient(self):
         for record in self:
-            if not record.date or not record.temperature or not record.density:
-                record.coefficient = 0.0
+            if not record.date:
+                record.coefficient = 0
                 continue
             
             astm = self.env['artec.astm'].with_context(active_test=False).search([
@@ -129,9 +129,6 @@ class ArtecGauging(models.Model):
             else:
                 astm_lines = astm.astm_line_ids
                 if not astm_lines:
-                    record.density = 199.0
-                    record.temperature = 0.0
-                    record.coefficient = 0.0
                     raise ValidationError(
                         "There are no lines in this ASTM"
                     )
@@ -189,7 +186,4 @@ class ArtecGauging(models.Model):
     @api.depends('theoretical_volume', 'coefficient')
     def _compute_volume(self):
         for record in self:
-            if record.theoretical_volume==0 or record.coefficient==0:
-                record.volume = 0
-                continue
             record.volume = record.theoretical_volume * record.coefficient
