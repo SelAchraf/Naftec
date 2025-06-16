@@ -62,7 +62,7 @@ class ArtecGauging(models.Model):
     @api.depends('date','tank_id','depth')
     def _compute_theoretical_volume(self):
         for record in self:
-            if not record.date or not record.tank_id:
+            if not record.date or not record.tank_id or not record.depth:
                 record.theoretical_volume = 0
                 continue
             strapping = self.env['artec.strapping'].with_context(active_test=False).search([

@@ -108,7 +108,7 @@ class ArtecExpedition(models.Model):
     @api.depends('start_date','tank_id','start_depth')
     def _compute_start_theoretical_volume(self):
         for record in self:
-            if not record.start_date or not record.tank_id:
+            if not record.start_date or not record.tank_id or not record.start_depth:
                 record.start_theoretical_volume = 0
                 continue
             strapping = self.env['artec.strapping'].with_context(active_test=False).search([

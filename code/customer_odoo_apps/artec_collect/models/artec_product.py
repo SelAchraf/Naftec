@@ -5,10 +5,12 @@ class ArtecProduct(models.Model):
     
     name = fields.Char(
         string='Name',
+        required=True
     )
     
     color = fields.Integer(
         string='Color',
+        required=True
     )
     
     tank_ids = fields.One2many(
