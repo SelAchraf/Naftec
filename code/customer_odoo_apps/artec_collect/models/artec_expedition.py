@@ -37,7 +37,6 @@ class ArtecExpedition(models.Model):
     
     start_depth = fields.Float(
         string='Depth before expedition [m]',
-        required=True
     )
     
     start_theoretical_volume = fields.Float(
@@ -68,12 +67,10 @@ class ArtecExpedition(models.Model):
     
     end_date = fields.Datetime(
         string='End date',
-        required=True
     )    
     
     end_depth = fields.Float(
         string='Depth after expedition [m]',
-        required=True
     )
     
     end_theoretical_volume = fields.Float(
@@ -94,6 +91,12 @@ class ArtecExpedition(models.Model):
         store=True
     )  
     
+    @api.constrains('start_depth')
+    def _check_start_depth_not_zero(self):
+        for record in self:
+            if record.start_depth == 0.0:
+                raise ValidationError("The depth before expedition must not be zero.")
+    
     @api.depends('start_date','tank_id')
     def _compute_name(self):
         for record in self:
@@ -105,8 +108,8 @@ class ArtecExpedition(models.Model):
     @api.depends('start_date','tank_id','start_depth')
     def _compute_start_theoretical_volume(self):
         for record in self:
-            if not record.start_date or not record.tank_id or not record.start_depth:
-                record.start_theoretical_volume = 0.0
+            if not record.start_date or not record.tank_id:
+                record.start_theoretical_volume = 0
                 continue
             strapping = self.env['artec.strapping'].with_context(active_test=False).search([
                 ('tank_id', '=', record.tank_id.id),
@@ -153,8 +156,8 @@ class ArtecExpedition(models.Model):
     @api.depends('end_date','tank_id','end_depth')
     def _compute_end_theoretical_volume(self):
         for record in self:
-            if not record.end_date or not record.tank_id or not record.end_depth:
-                record.end_theoretical_volume = 0.0
+            if not record.end_date or not record.tank_id:
+                record.end_theoretical_volume = 0
                 continue
             strapping = self.env['artec.strapping'].with_context(active_test=False).search([
                 ('tank_id', '=', record.tank_id.id),
@@ -197,3 +200,175 @@ class ArtecExpedition(models.Model):
                 raise ValidationError(
                     "There is no strapping"
                 )
+                
+    @api.depends('start_date', 'start_temperature', 'start_density')
+    def _compute_start_coefficient(self):
+        for record in self:
+            if not record.start_date:
+                record.start_coefficient = 0
+                continue
+            
+            astm = self.env['artec.astm'].with_context(active_test=False).search([
+                ('start_date', '<=', record.start_date),
+                ('state', '=', 'confirmed'),
+                '|',
+                ('end_date', '=', False),
+                ('end_date', '>', record.start_date)
+            ])
+            if not astm:
+                raise ValidationError(
+                    "There is no ASTM"
+                )
+            else:
+                astm_lines = astm.astm_line_ids
+                if not astm_lines:
+                    raise ValidationError(
+                        "There are no lines in this ASTM"
+                    )
+                else:         
+                    Tg = record.start_temperature
+                    Dg = record.start_density
+                    
+                    astm11 = astm_lines.filtered(lambda l:l.temperature <= Tg and l.density <= Dg)
+                    if not astm11:
+                        raise ValidationError("The data is out of ASTM's range")
+                    else:
+                        astm11 = sorted(astm11, key=lambda l: (l.temperature, l.density))[-1]
+                        Ti = astm11.temperature
+                        Di = astm11.density
+                        C11 = astm11.coefficient
+                        
+                        astm12 = astm_lines.filtered(lambda l:l.temperature == Ti and l.density >= Dg)
+                        if not astm12:
+                            raise ValidationError("The data is out of ASTM's range")
+                        else:
+                            astm12 = sorted(astm12, key=lambda l: (l.temperature, l.density))[0]
+                            Ds = astm12.density
+                            C12 = astm12.coefficient
+                        
+                        astm21 = astm_lines.filtered(lambda l:l.temperature >= Tg and l.density == Di)
+                        if not astm21:
+                            raise ValidationError("The data is out of ASTM's range")
+                        else:
+                            astm21 = sorted(astm21, key=lambda l: (l.temperature, l.density))[0]
+                            Ts = astm21.temperature
+                            C21 = astm21.coefficient
+                        
+                        astm22 = astm_lines.filtered(lambda l:l.temperature == Ts and l.density == Ds)
+                        if not astm22:
+                            raise ValidationError("The data is out of ASTM's range")
+                        else:
+                            C22 = astm22.coefficient
+                    
+                    if Tg == Ti:
+                        C1 = C11
+                        C2 = C12
+                    else:
+                        C1 = ((C21-C11)/(Ts-Ti))*(Tg-Ti) + C11
+                        C2 = ((C22-C12)/(Ts-Ti))*(Tg-Ti) + C12
+                    
+                    if Dg == Di:
+                        C3 = C11
+                        C4 = C21
+                    else:
+                        C3 = ((C12-C11)/(Ds-Di))*(Dg-Di) + C11
+                        C4 = ((C22-C21)/(Ds-Di))*(Dg-Di) + C21
+
+                    record.start_coefficient = (C1+C2+C3+C4)/4
+                    
+    @api.depends('end_date', 'end_temperature', 'end_density')
+    def _compute_end_coefficient(self):
+        for record in self:
+            if not record.end_date:
+                record.end_coefficient = 0
+                continue
+            
+            astm = self.env['artec.astm'].with_context(active_test=False).search([
+                ('start_date', '<=', record.end_date),
+                ('state', '=', 'confirmed'),
+                '|',
+                ('end_date', '=', False),
+                ('end_date', '>', record.end_date)
+            ])
+            if not astm:
+                raise ValidationError(
+                    "There is no ASTM"
+                )
+            else:
+                astm_lines = astm.astm_line_ids
+                if not astm_lines:
+                    raise ValidationError(
+                        "There are no lines in this ASTM"
+                    )
+                else:         
+                    Tg = record.end_temperature
+                    Dg = record.end_density
+                    
+                    astm11 = astm_lines.filtered(lambda l:l.temperature <= Tg and l.density <= Dg)
+                    if not astm11:
+                        raise ValidationError("The data is out of ASTM's range")
+                    else:
+                        astm11 = sorted(astm11, key=lambda l: (l.temperature, l.density))[-1]
+                        Ti = astm11.temperature
+                        Di = astm11.density
+                        C11 = astm11.coefficient
+                        
+                        astm12 = astm_lines.filtered(lambda l:l.temperature == Ti and l.density >= Dg)
+                        if not astm12:
+                            raise ValidationError("The data is out of ASTM's range")
+                        else:
+                            astm12 = sorted(astm12, key=lambda l: (l.temperature, l.density))[0]
+                            Ds = astm12.density
+                            C12 = astm12.coefficient
+                        
+                        astm21 = astm_lines.filtered(lambda l:l.temperature >= Tg and l.density == Di)
+                        if not astm21:
+                            raise ValidationError("The data is out of ASTM's range")
+                        else:
+                            astm21 = sorted(astm21, key=lambda l: (l.temperature, l.density))[0]
+                            Ts = astm21.temperature
+                            C21 = astm21.coefficient
+                        
+                        astm22 = astm_lines.filtered(lambda l:l.temperature == Ts and l.density == Ds)
+                        if not astm22:
+                            raise ValidationError("The data is out of ASTM's range")
+                        else:
+                            C22 = astm22.coefficient
+                    
+                    if Tg == Ti:
+                        C1 = C11
+                        C2 = C12
+                    else:
+                        C1 = ((C21-C11)/(Ts-Ti))*(Tg-Ti) + C11
+                        C2 = ((C22-C12)/(Ts-Ti))*(Tg-Ti) + C12
+                    
+                    if Dg == Di:
+                        C3 = C11
+                        C4 = C21
+                    else:
+                        C3 = ((C12-C11)/(Ds-Di))*(Dg-Di) + C11
+                        C4 = ((C22-C21)/(Ds-Di))*(Dg-Di) + C21
+
+                    record.end_coefficient = (C1+C2+C3+C4)/4
+                    
+    
+    @api.depends('start_theoretical_volume', 'start_coefficient')
+    def _compute_start_volume(self):
+        for record in self:
+            record.start_volume = record.start_theoretical_volume * record.start_coefficient
+            
+    @api.depends('end_theoretical_volume', 'end_coefficient')
+    def _compute_end_volume(self):
+        for record in self:
+            record.end_volume = record.end_theoretical_volume * record.end_coefficient
+            
+    @api.depends('start_volume', 'end_volume')
+    def _compute_expedited_volume(self):
+        for record in self:
+            if not record.start_volume:
+                record.expedited_volume = 0
+                continue
+            elif record.start_volume <= record.end_volume:
+                raise ValidationError("The volume after expedition must be less than the volume before expedition, please verify the entered parameters")
+            
+            record.expedited_volume = record.start_volume - record.end_volume
