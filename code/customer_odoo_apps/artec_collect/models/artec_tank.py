@@ -25,9 +25,3 @@ class ArtecTank(models.Model):
         inverse_name="tank_id",
         string="Strapping",
     )
-    
-    gauging_ids = fields.One2many(
-        comodel_name='artec.gauging',
-        inverse_name="tank_id",
-        string='Gauging'
-    )

@@ -8,17 +8,17 @@
             <list>
                 <field name="name"></field>
                 <field name="tank_id"></field>
-                <field name="expedited_volume"></field>
+                <field name="start_date"></field>
                 <field name="start_temperature"></field>
                 <field name="start_density"></field>
-                <field name="start_date"></field>
                 <field name="start_depth"></field>
                 <field name="start_volume"></field>
+                <field name="end_date"></field>
                 <field name="end_temperature"></field>
                 <field name="end_density"></field>
-                <field name="end_date"></field>
                 <field name="end_depth"></field>
                 <field name="end_volume"></field>
+                <field name="expedited_volume"></field>
             </list>
         </field>
     </record>
@@ -63,15 +63,11 @@
                                 <group>
                                     <field name="start_date"></field>
                                     <field name="start_depth"></field>
-                                    <field name="start_theoretical_volume"></field>
-                                    <field name="start_coefficient"></field>
                                     <field name="start_volume"></field>
                                 </group>
                                 <group>
                                     <field name="end_date"></field>
                                     <field name="end_depth"></field>
-                                    <field name="end_theoretical_volume"></field>
-                                    <field name="end_coefficient"></field>
                                     <field name="end_volume"></field>
                                 </group>
                             </group>

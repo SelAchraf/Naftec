@@ -12,6 +12,7 @@ class ArtecStrapping(models.Model):
         string='Name',
         copy=False,
         compute='_compute_name',
+        store=True
     )
     
     tank_id = fields.Many2one(
@@ -80,7 +81,7 @@ class ArtecStrapping(models.Model):
             all_strappings = self.with_context(active_test=False).search(domain)
             after_strappings = all_strappings.filtered(lambda s: s.start_date > record.start_date)
             
-            if after_strappings:
+            if after_strappings and not record.end_date:
                 raise ValidationError("End date is required when there are strappings present after this start date")
                 
             if not record.active and not record.end_date:
