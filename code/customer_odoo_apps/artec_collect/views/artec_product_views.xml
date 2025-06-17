@@ -39,7 +39,6 @@
 		<field name="arch" type="xml">
 			<search>
 				<field name="name"></field>
-				<field name="color"></field>
 				<field name="tank_ids"></field>
 			</search>
 		</field>
