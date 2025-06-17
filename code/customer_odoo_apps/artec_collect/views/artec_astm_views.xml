@@ -55,7 +55,6 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"></field>
-                <filter name="all_astms" string="All ASTMs" domain="[('active', 'in', [True, False])]"/>            
                 <filter name="is_archived" string="Archived" domain="[('active', '=', False)]"/>
                 <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
                 <filter name="confirmed" string="Confirmed" domain="[('state', '=', 'confirmed')]"/>
