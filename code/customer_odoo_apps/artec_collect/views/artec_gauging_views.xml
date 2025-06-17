@@ -55,6 +55,27 @@
         </field>
     </record>
 
+    <record id="artec_gauging_view_search" model="ir.ui.view">
+		<field name="name">Artec Gauging Search View</field>
+		<field name="model">artec.gauging</field>
+		<field name="arch" type="xml">
+			<search>
+				<field name="name"></field>
+				<field name="tank_id"></field>
+				<field name="date"></field>
+                <filter name="today" string="Today" domain="[('date', '=', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="yesterday" string="Yesterday" domain="[('date', '=', (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="last_week" string="Last Week" domain="[('date', '&gt;=', (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime('%Y-%m-%d %H:%M:%S')), ('date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="last_month" string="Last Month" domain="[('date', '&gt;=', (datetime.datetime.now() + datetime.timedelta(days=-30)).strftime('%Y-%m-%d %H:%M:%S')), ('date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="last_three_months" string="Last 3 Months" domain="[('date', '&gt;=', (datetime.datetime.now() + datetime.timedelta(days=-90)).strftime('%Y-%m-%d %H:%M:%S')), ('date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="last_six_months" string="Last 6 Months" domain="[('date', '&gt;=', (datetime.datetime.now() + datetime.timedelta(days=-180)).strftime('%Y-%m-%d %H:%M:%S')), ('date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="last_year" string="Last Year" domain="[('date', '&gt;=', (datetime.datetime.now() + datetime.timedelta(days=-365)).strftime('%Y-%m-%d %H:%M:%S')), ('date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter name="group_by_tank" string="Tank" context="{'group_by': 'tank_id'}" />
+                <filter name="group_by_daily" string="Date" context="{'group_by': 'date'}" />
+			</search>
+		</field>
+	</record>
+
     <record id="artec_gauging_action" model="ir.actions.act_window">
 		<field name="name">Gauging</field>
 		<field name="res_model">artec.gauging</field>
