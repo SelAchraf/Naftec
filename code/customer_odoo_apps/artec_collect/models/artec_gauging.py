@@ -13,10 +13,11 @@ class ArtecGauging(models.Model):
     tank_id = fields.Many2one(
         comodel_name='artec.tank',
         string='Tank',
-        required=True
+        required=True,
+        domain=[('product_id.name', '=', 'Oil')]
     )
     
-    date = fields.Datetime(
+    datetime = fields.Datetime(
         string='Date',
         required=True
     )
@@ -46,32 +47,32 @@ class ArtecGauging(models.Model):
     )
     
     volume = fields.Float(
-        string='Volume',
+        string='Volume [m3]',
         compute='_compute_volume',
         store=True
     )
     
-    @api.depends('date','tank_id')
+    @api.depends('datetime','tank_id')
     def _compute_name(self):
         for record in self:
-            if not record.date or not record.tank_id:
+            if not record.datetime or not record.tank_id:
                 record.name = False
                 continue
-            record.name = record.tank_id.name + '-' + str(record.date).replace(' ', '-')
+            record.name = record.tank_id.name + '-' + str(record.datetime).replace(' ', '-')
     
-    @api.depends('date','tank_id','depth')
+    @api.depends('datetime','tank_id','depth')
     def _compute_theoretical_volume(self):
         for record in self:
-            if not record.date or not record.tank_id or not record.depth:
+            if not record.datetime or not record.tank_id or not record.depth:
                 record.theoretical_volume = 0
                 continue
             strapping = self.env['artec.strapping'].with_context(active_test=False).search([
                 ('tank_id', '=', record.tank_id.id),
-                ('start_date', '<=', record.date),
+                ('start_datetime', '<=', record.datetime),
                 ('state', '=', 'confirmed'),
                 '|',
-                ('end_date', '=', False),
-                ('end_date', '>', record.date)
+                ('end_datetime', '=', False),
+                ('end_datetime', '>', record.datetime)
             ])
             if strapping:
                 strapping_lines = strapping.strapping_line_ids
@@ -108,19 +109,19 @@ class ArtecGauging(models.Model):
                     "There is no strapping"
                 )
     
-    @api.depends('date', 'temperature', 'density')
+    @api.depends('datetime', 'temperature', 'density')
     def _compute_coefficient(self):
         for record in self:
-            if not record.date:
+            if not record.datetime:
                 record.coefficient = 0
                 continue
             
             astm = self.env['artec.astm'].with_context(active_test=False).search([
-                ('start_date', '<=', record.date),
+                ('start_datetime', '<=', record.datetime),
                 ('state', '=', 'confirmed'),
                 '|',
-                ('end_date', '=', False),
-                ('end_date', '>', record.date)
+                ('end_datetime', '=', False),
+                ('end_datetime', '>', record.datetime)
             ])
             if not astm:
                 raise ValidationError(

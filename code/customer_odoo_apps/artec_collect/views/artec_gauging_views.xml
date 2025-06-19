@@ -8,12 +8,7 @@
             <list>
                 <field name="name"></field>
                 <field name="tank_id"></field>
-                <field name="date"></field>
-                <field name="depth"></field>
-                <field name="temperature"></field>
-                <field name="theoretical_volume"></field>
-                <field name="density"></field>
-                <field name="coefficient"></field>
+                <field name="datetime"></field>
                 <field name="volume"></field>
             </list>
         </field>
@@ -34,22 +29,27 @@
                     <group>
                         <group>
                             <field name="tank_id"></field>
-                            <field name="date"></field>
+                            <field name="datetime"></field>
                         </group>
-
                         <group>
+                            <field name="volume"></field>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Tank Status">
                             <group>
                                 <field name="depth"></field>
                                 <field name="theoretical_volume"></field>
                             </group>
+                        </page>
+                        <page string="Physical Parameters">
                             <group>
                                 <field name="temperature"></field>
                                 <field name="density"></field>
                                 <field name="coefficient"></field>
-                                <field name="volume"></field>
                             </group>
-                        </group>
-                    </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -62,16 +62,15 @@
 			<search>
 				<field name="name"></field>
 				<field name="tank_id"></field>
-				<field name="date"></field>
-                <filter name="today" string="Today" domain="[('date', '=', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
-                <filter name="yesterday" string="Yesterday" domain="[('date', '=', (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
-                <filter name="last_week" string="Last Week" domain="[('date', '&gt;=', (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime('%Y-%m-%d %H:%M:%S')), ('date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
-                <filter name="last_month" string="Last Month" domain="[('date', '&gt;=', (datetime.datetime.now() + datetime.timedelta(days=-30)).strftime('%Y-%m-%d %H:%M:%S')), ('date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
-                <filter name="last_three_months" string="Last 3 Months" domain="[('date', '&gt;=', (datetime.datetime.now() + datetime.timedelta(days=-90)).strftime('%Y-%m-%d %H:%M:%S')), ('date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
-                <filter name="last_six_months" string="Last 6 Months" domain="[('date', '&gt;=', (datetime.datetime.now() + datetime.timedelta(days=-180)).strftime('%Y-%m-%d %H:%M:%S')), ('date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
-                <filter name="last_year" string="Last Year" domain="[('date', '&gt;=', (datetime.datetime.now() + datetime.timedelta(days=-365)).strftime('%Y-%m-%d %H:%M:%S')), ('date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+				<field name="datetime"></field>
+                <filter name="yesterday" string="Yesterday" domain="[('datetime', '&gt;=', (context_today() + relativedelta(days = -1)).strftime('%Y-%m-%d')), ('datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_week" string="Last Week" domain="[('datetime', '&gt;=', (context_today() + relativedelta(weeks = -1)).strftime('%Y-%m-%d')), ('datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_month" string="Last Month" domain="[('datetime', '&gt;=', (context_today() + relativedelta(months = -1)).strftime('%Y-%m-%d')), ('datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_three_months" string="Last 3 Months" domain="[('datetime', '&gt;=', (context_today() + relativedelta(months = -3)).strftime('%Y-%m-%d')), ('datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_six_months" string="Last 6 Months" domain="[('datetime', '&gt;=', (context_today() + relativedelta(months = -6)).strftime('%Y-%m-%d')), ('datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_year" string="Last Year" domain="[('datetime', '&gt;=', (context_today() + relativedelta(years = -1)).strftime('%Y-%m-%d')), ('datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
                 <filter name="group_by_tank" string="Tank" context="{'group_by': 'tank_id'}" />
-                <filter name="group_by_daily" string="Date" context="{'group_by': 'date'}" />
+                <filter name="group_by_date" string="Date" context="{'group_by': 'datetime'}" />
 			</search>
 		</field>
 	</record>

@@ -8,17 +8,9 @@
             <list>
                 <field name="name"></field>
                 <field name="tank_id"></field>
-                <field name="start_date"></field>
-                <field name="start_temperature"></field>
-                <field name="start_density"></field>
-                <field name="start_depth"></field>
-                <field name="start_volume"></field>
-                <field name="end_date"></field>
-                <field name="end_temperature"></field>
-                <field name="end_density"></field>
-                <field name="end_depth"></field>
-                <field name="end_volume"></field>
-                <field name="expedited_volume"></field>
+                <field name="start_datetime"></field>
+                <field name="end_datetime"></field>
+                <field name="expedited_volume" width="200"></field>
             </list>
         </field>
     </record>
@@ -61,12 +53,12 @@
                         <page string="Expedition Informations">
                             <group>
                                 <group>
-                                    <field name="start_date"></field>
+                                    <field name="start_datetime"></field>
                                     <field name="start_depth"></field>
                                     <field name="start_volume"></field>
                                 </group>
                                 <group>
-                                    <field name="end_date"></field>
+                                    <field name="end_datetime"></field>
                                     <field name="end_depth"></field>
                                     <field name="end_volume"></field>
                                 </group>
@@ -77,6 +69,26 @@
             </form>
         </field>
     </record>
+
+    <record id="artec_expedition_view_search" model="ir.ui.view">
+		<field name="name">Artec Expedition Search View</field>
+		<field name="model">artec.expedition</field>
+		<field name="arch" type="xml">
+			<search>
+				<field name="name"></field>
+				<field name="tank_id"></field>
+				<field name="start_datetime"></field>
+				<field name="end_datetime"></field>
+                <filter name="yesterday" string="Yesterday" domain="[('start_datetime', '&gt;=', (context_today() + relativedelta(days = -1)).strftime('%Y-%m-%d')), ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_week" string="Last Week" domain="[('start_datetime', '&gt;=', (context_today() + relativedelta(weeks = -1)).strftime('%Y-%m-%d')), ('start_datetime','&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_month" string="Last Month" domain="[('start_datetime', '&gt;=', (context_today() + relativedelta(months = -1)).strftime('%Y-%m-%d')), ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_three_months" string="Last 3 Months" domain="[('start_datetime', '&gt;=', (context_today() + relativedelta(months = -3)).strftime('%Y-%m-%d')), ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_six_months" string="Last 6 Months" domain="[('start_datetime', '&gt;=', (context_today() + relativedelta(months = -6)).strftime('%Y-%m-%d')), ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_year" string="Last Year" domain="[('start_datetime', '&gt;=', (context_today() + relativedelta(years = -1)).strftime('%Y-%m-%d')), ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="group_by_tank" string="Tank" context="{'group_by': 'tank_id'}" />
+			</search>
+		</field>
+	</record>
 
     <record id="artec_expedition_action" model="ir.actions.act_window">
 		<field name="name">Expedition</field>
