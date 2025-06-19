@@ -21,9 +21,9 @@ class ArtecProduction(models.Model):
         required=True
     )
     
-    volume = fields.Float(
-        string='Production volume',
-        compute='_compute_volume',
+    produced_volume = fields.Float(
+        string='Produced volume [m3]',
+        compute='_compute_produced_volume',
         store=True
     )
     
@@ -36,7 +36,7 @@ class ArtecProduction(models.Model):
             record.name = record.tank_id.name + '-' + str(record.date)
     
     @api.depends('tank_id', 'date')
-    def _compute_volume(self):        
+    def _compute_produced_volume(self):        
         for record in self:
             if not record.tank_id or not record.date:
                 continue
@@ -48,21 +48,21 @@ class ArtecProduction(models.Model):
             if not gaugings:
                 raise ValidationError("There is no gaugings for this tank")
             
-            previous_gaugings = gaugings.filtered(lambda g: g.date < fields.Datetime.to_datetime(record.date))
-            next_gaugings = gaugings.filtered(lambda g: g.date > fields.Datetime.to_datetime(record.date))
+            previous_gaugings = gaugings.filtered(lambda g: g.datetime < fields.Datetime.to_datetime(record.date))
+            next_gaugings = gaugings.filtered(lambda g: g.datetime > fields.Datetime.to_datetime(record.date))
             
             if not previous_gaugings or not next_gaugings:
                 raise ValidationError("There is no previous or next gaugings for this date")
             
-            last_previous_gauging = previous_gaugings.sorted(key=lambda g: g.date, reverse=True)[0]
-            first_next_gauging = next_gaugings.sorted(key=lambda g: g.date)[0]
+            last_previous_gauging = previous_gaugings.sorted(key=lambda g: g.datetime, reverse=True)[0]
+            first_next_gauging = next_gaugings.sorted(key=lambda g: g.datetime)[0]
             
             expeditions = self.env['artec.expedition'].search([
                 ('tank_id', '=', record.tank_id.id),
-                ('start_date', '>', fields.Datetime.to_datetime(last_previous_gauging.date)),
-                ('start_date', '<', fields.Datetime.to_datetime(first_next_gauging.date)),
-                ('end_date', '>', fields.Datetime.to_datetime(last_previous_gauging.date)),
-                ('end_date', '<', fields.Datetime.to_datetime(first_next_gauging.date)),
+                ('start_datetime', '>', fields.Datetime.to_datetime(last_previous_gauging.datetime)),
+                ('start_datetime', '<', fields.Datetime.to_datetime(first_next_gauging.datetime)),
+                ('end_datetime', '>', fields.Datetime.to_datetime(last_previous_gauging.datetime)),
+                ('end_datetime', '<', fields.Datetime.to_datetime(first_next_gauging.datetime)),
             ])
             
             expedited_volume = 0
@@ -71,4 +71,4 @@ class ArtecProduction(models.Model):
                 for expedition in expeditions:
                     expedited_volume += expedition.expedited_volume
             
-            record.volume = first_next_gauging.volume - last_previous_gauging.volume + expedited_volume
+            record.produced_volume = first_next_gauging.volume - last_previous_gauging.volume + expedited_volume

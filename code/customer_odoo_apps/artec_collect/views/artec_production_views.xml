@@ -8,8 +8,8 @@
             <list>
                 <field name="name"></field>
                 <field name="tank_id"></field>
-                <field name="date"></field>
-                <field name="volume"></field>
+                <field name="date" width="150"></field>
+                <field name="produced_volume" width="150"></field>
             </list>
         </field>
     </record>
@@ -27,14 +27,39 @@
                         </h1>
                     </div>
                     <group>
-                        <field name="tank_id"/>
-                        <field name="date"/>
-                        <field name="volume"/>
+                        <group>
+                            <field name="tank_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="produced_volume"/>
+                        </group>
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
+
+    <record id="artec_production_view_search" model="ir.ui.view">
+		<field name="name">Artec Production Search View</field>
+		<field name="model">artec.production</field>
+		<field name="arch" type="xml">
+			<search>
+				<field name="name"></field>
+				<field name="tank_id"></field>
+				<field name="date"></field>
+                <filter name="today" string="Today" domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="yesterday" string="Yesterday" domain="[('date', '=', (context_today() + relativedelta(days = -1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last_week" string="Last Week" domain="[('date', '&gt;=', (context_today() + relativedelta(weeks = -1)).strftime('%Y-%m-%d')), ('date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_month" string="Last Month" domain="[('date', '&gt;=', (context_today() + relativedelta(months = -1)).strftime('%Y-%m-%d')), ('date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_three_months" string="Last 3 Months" domain="[('date', '&gt;=', (context_today() + relativedelta(months = -3)).strftime('%Y-%m-%d')), ('date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_six_months" string="Last 6 Months" domain="[('date', '&gt;=', (context_today() + relativedelta(months = -6)).strftime('%Y-%m-%d')), ('date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="last_year" string="Last Year" domain="[('date', '&gt;=', (context_today() + relativedelta(years = -1)).strftime('%Y-%m-%d')), ('date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="group_by_tank" string="Tank" context="{'group_by': 'tank_id'}" />
+                <filter name="group_by_date" string="Date" context="{'group_by': 'date'}" />
+			</search>
+		</field>
+	</record>
 
     <record id="artec_production_action" model="ir.actions.act_window">
         <field name="name">Production</field>

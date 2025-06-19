@@ -30,7 +30,7 @@ class ArtecExpedition(models.Model):
         string='Density before expedition [sg]'
     )
     
-    start_date = fields.Datetime(
+    start_datetime = fields.Datetime(
         string='Start date',
         required=True
     )    
@@ -65,7 +65,7 @@ class ArtecExpedition(models.Model):
         string='Density after expedition [sg]'
     )
     
-    end_date = fields.Datetime(
+    end_datetime = fields.Datetime(
         string='End date',
     )    
     
@@ -97,27 +97,27 @@ class ArtecExpedition(models.Model):
             if record.start_depth == 0.0:
                 raise ValidationError("The depth before expedition must not be zero.")
     
-    @api.depends('start_date','tank_id')
+    @api.depends('start_datetime','tank_id')
     def _compute_name(self):
         for record in self:
-            if not record.start_date or not record.tank_id:
+            if not record.start_datetime or not record.tank_id:
                 record.name = False
                 continue
-            record.name = record.tank_id.name + '-' + str(record.start_date).replace(' ', '-')
+            record.name = record.tank_id.name + '-' + str(record.start_datetime).replace(' ', '-')
     
-    @api.depends('start_date','tank_id','start_depth')
+    @api.depends('start_datetime','tank_id','start_depth')
     def _compute_start_theoretical_volume(self):
         for record in self:
-            if not record.start_date or not record.tank_id or not record.start_depth:
+            if not record.start_datetime or not record.tank_id or not record.start_depth:
                 record.start_theoretical_volume = 0
                 continue
             strapping = self.env['artec.strapping'].with_context(active_test=False).search([
                 ('tank_id', '=', record.tank_id.id),
-                ('start_date', '<=', record.start_date),
+                ('start_datetime', '<=', record.start_datetime),
                 ('state', '=', 'confirmed'),
                 '|',
-                ('end_date', '=', False),
-                ('end_date', '>', record.start_date)
+                ('end_datetime', '=', False),
+                ('end_datetime', '>', record.start_datetime)
             ])
             if strapping:
                 strapping_lines = strapping.strapping_line_ids
@@ -153,19 +153,19 @@ class ArtecExpedition(models.Model):
                     "There is no strapping"
                 )
     
-    @api.depends('end_date','tank_id','end_depth')
+    @api.depends('end_datetime','tank_id','end_depth')
     def _compute_end_theoretical_volume(self):
         for record in self:
-            if not record.end_date or not record.tank_id:
+            if not record.end_datetime or not record.tank_id:
                 record.end_theoretical_volume = 0
                 continue
             strapping = self.env['artec.strapping'].with_context(active_test=False).search([
                 ('tank_id', '=', record.tank_id.id),
-                ('start_date', '<=', record.end_date),
+                ('start_datetime', '<=', record.end_datetime),
                 ('state', '=', 'confirmed'),
                 '|',
-                ('end_date', '=', False),
-                ('end_date', '>', record.end_date)
+                ('end_datetime', '=', False),
+                ('end_datetime', '>', record.end_datetime)
             ])
             if strapping:
                 strapping_lines = strapping.strapping_line_ids
@@ -201,19 +201,19 @@ class ArtecExpedition(models.Model):
                     "There is no strapping"
                 )
                 
-    @api.depends('start_date', 'start_temperature', 'start_density')
+    @api.depends('start_datetime', 'start_temperature', 'start_density')
     def _compute_start_coefficient(self):
         for record in self:
-            if not record.start_date:
+            if not record.start_datetime:
                 record.start_coefficient = 0
                 continue
             
             astm = self.env['artec.astm'].with_context(active_test=False).search([
-                ('start_date', '<=', record.start_date),
+                ('start_datetime', '<=', record.start_datetime),
                 ('state', '=', 'confirmed'),
                 '|',
-                ('end_date', '=', False),
-                ('end_date', '>', record.start_date)
+                ('end_datetime', '=', False),
+                ('end_datetime', '>', record.start_datetime)
             ])
             if not astm:
                 raise ValidationError(
@@ -276,19 +276,19 @@ class ArtecExpedition(models.Model):
 
                     record.start_coefficient = (C1+C2+C3+C4)/4
                     
-    @api.depends('end_date', 'end_temperature', 'end_density')
+    @api.depends('end_datetime', 'end_temperature', 'end_density')
     def _compute_end_coefficient(self):
         for record in self:
-            if not record.end_date:
+            if not record.end_datetime:
                 record.end_coefficient = 0
                 continue
             
             astm = self.env['artec.astm'].with_context(active_test=False).search([
-                ('start_date', '<=', record.end_date),
+                ('start_datetime', '<=', record.end_datetime),
                 ('state', '=', 'confirmed'),
                 '|',
-                ('end_date', '=', False),
-                ('end_date', '>', record.end_date)
+                ('end_datetime', '=', False),
+                ('end_datetime', '>', record.end_datetime)
             ])
             if not astm:
                 raise ValidationError(
