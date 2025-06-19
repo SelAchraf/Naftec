@@ -8,8 +8,8 @@
             <list>
                 <field name="name"></field>
                 <field name="tank_id"></field>
-                <field name="start_date"></field>
-                <field name="end_date"></field>
+                <field name="start_datetime"></field>
+                <field name="end_datetime"></field>
                 <field name="active"></field>
             </list>
         </field>
@@ -33,12 +33,12 @@
                     </div>
                     <group>
                         <group>
-                            <field name="start_date" readonly="state == 'confirmed'"></field>
-                            <field name="end_date"></field>
-                            <field name="active"></field>
+                            <field name="tank_id" readonly="state == 'confirmed'"></field>
                         </group>
                         <group>
-                            <field name="tank_id" readonly="state == 'confirmed'"></field>
+                            <field name="start_datetime" readonly="state == 'confirmed'"></field>
+                            <field name="end_datetime"></field>
+                            <field name="active"></field>
                         </group>
                     </group>
                     <group>
@@ -61,58 +61,58 @@
             <search>
                 <field name="name"></field>
                 <field name="tank_id"></field>
-                <field name="start_date"></field>
-                <field name="end_date"></field>
+                <field name="start_datetime"></field>
+                <field name="end_datetime"></field>
                 <filter name="is_archived" string="Archived" domain="[('active', '=', False)]"/>
                 <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
                 <filter name="confirmed" string="Confirmed" domain="[('state', '=', 'confirmed')]"/>
                 <separator/>
                 <filter name="active_yesterday" string="Yesterday" domain="[
                     '&amp;',
-                        ('start_date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                        ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d')),
                         '|',
-                            ('end_date', '=', False),
-                            ('end_date', '&gt;', (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('end_datetime', '=', False),
+                            ('end_datetime', '&gt;', (context_today() + relativedelta(days = -1)).strftime('%Y-%m-%d')),
                         ('active', 'in', [True, False])
                 ]"/>
                 <filter name="active_last_week" string="Last Week" domain="[
                     '&amp;',
-                        ('start_date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                        ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d')),
                         '|',
-                            ('end_date', '=', False),
-                            ('end_date', '&gt;', (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('end_datetime', '=', False),
+                            ('end_datetime', '&gt;', (context_today() + relativedelta(weeks = -1)).strftime('%Y-%m-%d')),
                         ('active', 'in', [True, False])
                 ]"/>
                 <filter name="active_last_month" string="Last Month" domain="[
                     '&amp;',
-                        ('start_date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                        ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d')),
                         '|',
-                            ('end_date', '=', False),
-                            ('end_date', '&gt;', (datetime.datetime.now() + datetime.timedelta(days=-30)).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('end_datetime', '=', False),
+                            ('end_datetime', '&gt;', (context_today() + relativedelta(months = -1)).strftime('%Y-%m-%d')),
                         ('active', 'in', [True, False])
                 ]"/>
                 <filter name="active_last_three_months" string="Last 3 Months" domain="[
                     '&amp;',
-                        ('start_date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                        ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d')),
                         '|',
-                            ('end_date', '=', False),
-                            ('end_date', '&gt;', (datetime.datetime.now() + datetime.timedelta(days=-90)).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('end_datetime', '=', False),
+                            ('end_datetime', '&gt;', (context_today() + relativedelta(months = -3)).strftime('%Y-%m-%d')),
                         ('active', 'in', [True, False])
                 ]"/>
                 <filter name="active_last_six_months" string="Last 6 Months" domain="[
                     '&amp;',
-                        ('start_date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                        ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d')),
                         '|',
-                            ('end_date', '=', False),
-                            ('end_date', '&gt;', (datetime.datetime.now() + datetime.timedelta(days=-180)).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('end_datetime', '=', False),
+                            ('end_datetime', '&gt;', (context_today() + relativedelta(months = -6)).strftime('%Y-%m-%d')),
                         ('active', 'in', [True, False])
                 ]"/>
                 <filter name="active_last_year" string="Last Year" domain="[
                     '&amp;',
-                        ('start_date', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                        ('start_datetime', '&lt;', context_today().strftime('%Y-%m-%d')),
                         '|',
-                            ('end_date', '=', False),
-                            ('end_date', '&gt;', (datetime.datetime.now() + datetime.timedelta(days=-365)).strftime('%Y-%m-%d %H:%M:%S')),
+                            ('end_datetime', '=', False),
+                            ('end_datetime', '&gt;', (context_today() + relativedelta(years = -1)).strftime('%Y-%m-%d')),
                         ('active', 'in', [True, False])
                 ]"/>
                 <filter name="group_by_tank" string="Tank" context="{'group_by': 'tank_id'}" />
