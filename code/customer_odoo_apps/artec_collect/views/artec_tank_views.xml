@@ -7,8 +7,11 @@
 			<list>
 				<field name="name" />
 				<field name="product_id" />
-				<field name="length" width="150"/>
+				<field name="height" width="150"/>
 				<field name="width" width="150"/>
+				<field name="current_volume" width="200" string="Current Volume [m³]"/>
+				<field name="capacity" width="150"/>
+				<field name="percentage" width="150"/>
 			</list>
 		</field>
 	</record>
@@ -20,7 +23,7 @@
 			<form>
 				<sheet>
 					<div name="button_box" class="oe_button_box d-flex gap-3">
-						<button name="action_get_strapping_records" 
+						<button name="action_get_strapping_records" invisible="strapping_count == False" 
 								type="object" 
 								class="oe_stat_button btn btn-sm btn-primary rounded-pill d-flex align-items-center justify-content-center gap-2 shadow-sm hover:bg-blue-600">
 								<span>Strappings</span>
@@ -28,7 +31,15 @@
 									<field name="strapping_count" />
 								</span>
 						</button>
-						<button name="action_get_expedition_records" 
+						<button name="action_get_gauging_records" invisible="gauging_count == False"
+								type="object" 
+								class="oe_stat_button btn btn-sm btn-primary rounded-pill d-flex align-items-center justify-content-center gap-2 shadow-sm hover:bg-blue-600">
+								<span>Gaugings</span>
+								<span class="badge bg-light text-dark rounded-pill">
+									<field name="gauging_count" />
+								</span>
+						</button>
+						<button name="action_get_expedition_records" invisible="expedition_count == False"
 								type="object" 
 								class="oe_stat_button btn btn-sm btn-primary rounded-pill d-flex align-items-center justify-content-center gap-2 shadow-sm hover:bg-blue-600">
 								<span>Expeditions</span>
@@ -36,7 +47,7 @@
 									<field name="expedition_count" />
 								</span>
 						</button>
-						<button name="action_get_production_records" 
+						<button name="action_get_production_records" invisible="production_count == False"
 								type="object" 
 								class="oe_stat_button btn btn-sm btn-primary rounded-pill d-flex align-items-center justify-content-center gap-2 shadow-sm hover:bg-blue-600">
 								<span>Productions</span>
@@ -55,12 +66,15 @@
                         <page string="Informations">
                             <group>
 								<field name="product_id"></field>
+								<field name="current_volume" string="Current Volume [m³]"></field>
+								<field name="percentage"></field>
                             </group>
                         </page>
                         <page string="Dimensions">
                             <group>
 								<field name="width"></field>
-								<field name="length"></field>
+								<field name="height"></field>
+								<field name="capacity"></field>
                             </group>
                         </page>
                     </notebook>
@@ -76,7 +90,9 @@
 			<search>
 				<field name="name"></field>
 				<field name="width"></field>
-				<field name="length"></field>
+				<field name="height"></field>
+				<field name="current_volume" string="Current Volume [m³]"></field>
+				<field name="capacity"></field>
 				<field name="product_id"></field>
 				<field name="strapping_ids"></field>
 				<filter name="group_by_product" string="Product" context="{'group_by': 'product_id'}" />
@@ -88,36 +104,68 @@
 		<field name="name">Artec Tank Kanban View</field>
 		<field name="model">artec.tank</field>
 		<field name="arch" type="xml">
-			<kanban>
+			<kanban class="o_kanban_small_column">
 				<field name="name"/>
-                <field name="width"/>
-                <field name="length"/>
-                <field name="product_id"/>
-                <templates>
-                    <t t-name="card">
-                        <div class="oe_kanban_card">
-                            <div class="oe_kanban_content">
-                                <h4><field name="name"/></h4>
-                                <div>
-                                    <strong>Width: </strong> 
-									<field name="width"/>
-                                </div>
-                                <div>
-                                    <strong>Length: </strong>
-									<field name="length"/>
-                                </div>                                
-								<div>
-                                    <strong>Product: </strong>
-									<field name="product_id"/>
-                                </div>
-								<div>
-									<strong>Strapping: </strong>
-									<field name="strapping_ids" widget="many2many_tags"/>
+				<field name="width"/>
+				<field name="height"/>
+				<field name="capacity"/>
+				<field name="product_id"/>
+				<templates>
+					<t t-name="kanban-box">
+						<div class="oe_kanban_card oe_kanban_global_click card border-0 shadow-sm h-100" style="background-color: #ffffff; transition: transform 0.2s, box-shadow 0.2s;" t-att-style="'border-left: 4px solid ' + (record.product_id.raw_value.color || '#ffffff')">
+							<div class="oe_kanban_content p-3 d-flex flex-column">
+								<!-- Header with tank name -->
+								<div class="d-flex align-items-center mb-3">
+									<h4 class="mb-0 text-truncate fw-bold fs-2">
+										<field name="name"/>
+									</h4>
 								</div>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
+								<!-- Tank details -->
+								<div class="p-0 container o_kanban_card_content">
+									<ul class="list-group">
+										<li class="list-group-item d-flex justify-content-between" t-if="record.product_id.raw_value">
+											Product:
+											<span class="badge bg-primary badge-pill text-white">
+												<field name="product_id"/>
+											</span>
+										</li>
+										<li class="list-group-item d-flex justify-content-between" t-if="!record.product_id.raw_value">
+											Product:
+											<span class="badge bg-secondary badge-pill text-muted">
+												No product assigned
+											</span>
+										</li>
+										<li class="list-group-item d-flex justify-content-between">
+											Width:
+											<span class="badge bg-primary badge-pill text-white">
+												<field name="width"/> m
+											</span>
+										</li>
+										<li class="list-group-item d-flex justify-content-between">
+											Height:
+											<span class="badge bg-primary badge-pill text-white">
+												<field name="height"/> m
+											</span>
+										</li>
+										<li class="list-group-item d-flex justify-content-between">
+											Current Volume:
+											<span class="badge bg-primary badge-pill text-white">
+												<field name="current_volume"/> m³
+											</span>
+										</li>
+										<li class="list-group-item d-flex justify-content-between">
+											Capacity:
+											<span class="badge bg-primary badge-pill text-white">
+												<field name="capacity"/> m³
+											</span>
+										</li>										
+									</ul>
+									<field name="current_volume" string="Current Volume" widget="gauge" options="{'max_field': 'capacity'}"/>
+								</div>
+							</div>
+						</div>
+					</t>
+				</templates>
 			</kanban>
 		</field>
 	</record>
