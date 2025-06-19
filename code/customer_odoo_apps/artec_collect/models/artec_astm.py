@@ -8,12 +8,12 @@ class ArtecAstm(models.Model):
         string='Name'
     )
     
-    start_date = fields.Datetime(
+    start_datetime = fields.Datetime(
         string='Start date',
         required=True,
     )
     
-    end_date = fields.Datetime(
+    end_datetime = fields.Datetime(
         string='End date',
     )  
     
@@ -38,29 +38,29 @@ class ArtecAstm(models.Model):
         string='ASTM Lines'
     )
     
-    @api.constrains('start_date', 'end_date')
+    @api.constrains('start_datetime', 'end_datetime')
     def _check_end_date_after_start_date(self):
         for record in self:
-            if record.start_date and record.end_date:
-                if record.end_date <= record.start_date:
+            if record.start_datetime and record.end_datetime:
+                if record.end_datetime <= record.start_datetime:
                     raise ValidationError("End date must be greater than start date.")
     
-    @api.constrains('end_date', 'active')
+    @api.constrains('end_datetime', 'active')
     def _check_end_date_required(self):
         for record in self:
-            if not record.active and not record.end_date:
+            if not record.active and not record.end_datetime:
                 raise ValidationError("End date is required when the ASTM is inactive.")
     
-    @api.depends('start_date', 'end_date')
+    @api.depends('start_datetime', 'end_datetime')
     def _compute_active(self):
         for record in self:
-            today = fields.Datetime.today()
-            if (not record.end_date or (record.end_date and record.end_date > today)) and record.start_date and record.start_date <= today:
+            now = fields.Datetime.now()
+            if (not record.end_datetime or (record.end_datetime and record.end_datetime > now)) and record.start_datetime and record.start_datetime <= now:
                 record.active = True
             else:
                 record.active = False
     
-    @api.constrains('start_date', 'end_date')
+    @api.constrains('start_datetime', 'end_datetime')
     def _check_date_overlap(self):
         for record in self:
             # Search for all ASTM records, excluding the current record
@@ -68,13 +68,13 @@ class ArtecAstm(models.Model):
             all_astms = self.with_context(active_test=False).search(domain)
             
             def is_date_overlap(astm):
-                astm_start = astm.start_date
-                astm_end = astm.end_date
+                astm_start = astm.start_datetime
+                astm_end = astm.end_datetime
                 
                 overlap_status = (
-                    (astm_end and ((astm_start < record.start_date < astm_end) or (record.end_date and (astm_start < record.end_date < astm_end))))
-                    or ((not astm_end and record.end_date) and (record.start_date < astm_start < record.end_date))
-                    or (not astm_end and not record.end_date and astm_start == record.start_date)
+                    (astm_end and ((astm_start < record.start_datetime < astm_end) or (record.end_datetime and (astm_start < record.end_datetime < astm_end))))
+                    or ((not astm_end and record.end_datetime) and (record.start_datetime < astm_start < record.end_datetime))
+                    or (not astm_end and not record.end_datetime and astm_start == record.start_datetime)
                 )
                 return overlap_status
             
@@ -86,10 +86,10 @@ class ArtecAstm(models.Model):
                     "Please ensure date ranges do not overlap with other ASTM records."
                 )
             elif record.active:
-                active_astms = all_astms.filtered(lambda s: s.active and s.start_date < record.start_date)
+                active_astms = all_astms.filtered(lambda s: s.active and s.start_datetime < record.start_datetime)
                 if active_astms:
                     for active_astm in active_astms:
-                        active_astm.end_date = record.start_date
+                        active_astm.end_datetime = record.start_datetime
     
     def action_confirm(self):
         for record in self:

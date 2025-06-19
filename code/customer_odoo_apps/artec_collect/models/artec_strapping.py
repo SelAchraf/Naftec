@@ -1,5 +1,6 @@
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
+from datetime import datetime
 
 class ArtecStrapping(models.Model):
     _name="artec.strapping"
@@ -18,6 +19,7 @@ class ArtecStrapping(models.Model):
     tank_id = fields.Many2one(
         comodel_name="artec.tank",
         string="Tank",
+        default=lambda self: self._context.get('default_tank_id', False),
         required=True,
     )
     
@@ -27,12 +29,12 @@ class ArtecStrapping(models.Model):
         string='Strapping Lines'
     )
     
-    start_date = fields.Datetime(
+    start_datetime = fields.Datetime(
         string='Start date',
         required=True,
     )    
     
-    end_date = fields.Datetime(
+    end_datetime = fields.Datetime(
         string='End date',
     )  
     
@@ -64,14 +66,14 @@ class ArtecStrapping(models.Model):
                 continue
             record.name = f"{record.tank_id.name}_Strapping_{record.sequence}"
     
-    @api.constrains('start_date', 'end_date')
+    @api.constrains('start_datetime', 'end_datetime')
     def _check_end_date_after_start_date(self):
         for record in self:
-            if record.start_date and record.end_date:
-                if record.end_date <= record.start_date:
+            if record.start_datetime and record.end_datetime:
+                if record.end_datetime <= record.start_datetime:
                     raise ValidationError("End date must be greater than start date.")
     
-    @api.constrains('end_date', 'active')
+    @api.constrains('end_datetime', 'active')
     def _check_end_date_required(self):        
         for record in self:
             domain = [
@@ -79,24 +81,24 @@ class ArtecStrapping(models.Model):
                 ('id', '!=', record.id),
             ]
             all_strappings = self.with_context(active_test=False).search(domain)
-            after_strappings = all_strappings.filtered(lambda s: s.start_date > record.start_date)
+            after_strappings = all_strappings.filtered(lambda s: s.start_datetime > record.start_datetime)
             
-            if after_strappings and not record.end_date:
+            if after_strappings and not record.end_datetime:
                 raise ValidationError("End date is required when there are strappings present after this start date")
                 
-            if not record.active and not record.end_date:
+            if not record.active and not record.end_datetime:
                 raise ValidationError("End date is required when the strapping is inactive.")
     
-    @api.depends('start_date', 'end_date')
+    @api.depends('start_datetime', 'end_datetime')
     def _compute_active(self):
         for record in self:
-            today = fields.Datetime.now()
-            if (not record.end_date or (record.end_date and record.end_date > today)) and record.start_date and record.start_date <= today:
+            now = fields.Datetime.now()
+            if (not record.end_datetime or (record.end_datetime and record.end_datetime > now)) and record.start_datetime and record.start_datetime <= now:
                 record.active = True
             else:
                 record.active = False
             
-    @api.constrains('start_date', 'end_date', 'tank_id')
+    @api.constrains('start_datetime', 'end_datetime', 'tank_id')
     def _check_date_overlap(self):
         for record in self:
             domain = [
@@ -106,12 +108,12 @@ class ArtecStrapping(models.Model):
             all_strappings = self.with_context(active_test=False).search(domain)
             
             def is_date_overlap(strapping):
-                strapping_start = strapping.start_date
-                strapping_end = strapping.end_date
+                strapping_start = strapping.start_datetime
+                strapping_end = strapping.end_datetime
                 
                 overlap_status = (
-                    (strapping_end and ((strapping_start < record.start_date < strapping_end) or (record.end_date and (strapping_start < record.end_date < strapping_end))))
-                    or ((not strapping_end and record.end_date) and (record.start_date < strapping_start < record.end_date))
+                    (strapping_end and ((strapping_start < record.start_datetime < strapping_end) or (record.end_datetime and (strapping_start < record.end_datetime < strapping_end))))
+                    or ((not strapping_end and record.end_datetime) and (record.start_datetime < strapping_start < record.end_datetime))
                 )
                 return overlap_status
             
@@ -123,10 +125,10 @@ class ArtecStrapping(models.Model):
                     "Please ensure date ranges do not overlap with other strappings."
                 )
             elif record.active:
-                active_strappings = all_strappings.filtered(lambda s: s.active and s.start_date < record.start_date)
+                active_strappings = all_strappings.filtered(lambda s: s.active and s.start_datetime < record.start_datetime)
                 if active_strappings:
                     for active_strapping in active_strappings:
-                        active_strapping.end_date = record.start_date
+                        active_strapping.end_datetime = record.start_datetime
     
     def action_confirm(self):
         for record in self:
