@@ -5,7 +5,8 @@ class ArtecAstm(models.Model):
     _name = 'artec.astm'
     
     name = fields.Char(
-        string='Name'
+        string='Name',
+        required=True
     )
     
     start_datetime = fields.Datetime(
