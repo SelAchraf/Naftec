@@ -10,7 +10,7 @@ class ArtecStrappingLine(models.Model):
     )
 
     volume = fields.Float(
-        string='Volume [m3]',
+        string='Volume [m³]',
     )
     
     strapping_id = fields.Many2one(
@@ -21,5 +21,5 @@ class ArtecStrappingLine(models.Model):
     @api.constrains('depth', 'volume')
     def _check_depth_volume_zero(self):
         for record in self:
-            if (record.depth == 0.0 and record.volume != 0.0) or (record.volume == 0.0 and record.depth != 0.0):
+            if (record.depth == 0 and record.volume != 0) or (record.volume == 0 and record.depth != 0):
                 raise ValidationError("If one of depth or volume is zero, the other must also be zero.")

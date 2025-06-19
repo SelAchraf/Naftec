@@ -17,7 +17,7 @@ class ArtecExpedition(models.Model):
     )
     
     expedited_volume = fields.Float(
-        string='Expedited Volume [m3]',
+        string='Expedited Volume [m³]',
         compute = '_compute_expedited_volume',
         store=True
     )
@@ -40,7 +40,7 @@ class ArtecExpedition(models.Model):
     )
     
     start_theoretical_volume = fields.Float(
-        string='Theoretical volume before expedition [m3]',
+        string='Theoretical volume before expedition [m³]',
         compute='_compute_start_theoretical_volume',
         store=True
     )
@@ -52,7 +52,7 @@ class ArtecExpedition(models.Model):
     )
     
     start_volume = fields.Float(
-        string='Volume before expedition [m3]',
+        string='Volume before expedition [m³]',
         compute = '_compute_start_volume',
         store=True
     )
@@ -74,7 +74,7 @@ class ArtecExpedition(models.Model):
     )
     
     end_theoretical_volume = fields.Float(
-        string='Theoretical volume after expedition [m3]',
+        string='Theoretical volume after expedition [m³]',
         compute='_compute_end_theoretical_volume',
         store=True
     )
@@ -86,7 +86,7 @@ class ArtecExpedition(models.Model):
     )
     
     end_volume = fields.Float(
-        string='Volume after expedition [m3]',
+        string='Volume after expedition [m³]',
         compute = '_compute_end_volume',
         store=True
     )  
@@ -94,7 +94,7 @@ class ArtecExpedition(models.Model):
     @api.constrains('start_depth')
     def _check_start_depth_not_zero(self):
         for record in self:
-            if record.start_depth == 0.0:
+            if record.start_depth == 0:
                 raise ValidationError("The depth before expedition must not be zero.")
     
     @api.depends('start_datetime','tank_id')
