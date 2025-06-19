@@ -6,14 +6,21 @@ class ArtecTank(models.Model):
     
     name = fields.Char(
         string='Name',
+        required=True
     )
     
-    width = fields.Float(
-        string='Width [m]',
+    product_id = fields.Many2one(
+        comodel_name='artec.product',
+        string='Product',
+        required=True
     )
     
     height = fields.Float(
         string='Height [m]',
+    )
+    
+    width = fields.Float(
+        string='Width [m]',
     )
     
     current_volume = fields.Float(
@@ -29,11 +36,6 @@ class ArtecTank(models.Model):
         string="Percentage %",
         compute="_compute_percentage",
         store=True
-    )
-    
-    product_id = fields.Many2one(
-        comodel_name='artec.product',
-        string='Product'
     )
     
     strapping_ids = fields.One2many(
