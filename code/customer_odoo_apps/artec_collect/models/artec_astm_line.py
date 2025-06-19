@@ -30,5 +30,5 @@ class ArtecAstmLine(models.Model):
     @api.constrains('coefficient')
     def _check_coefficient_not_zero(self):
         for record in self:
-            if record.coefficient == 0.0:
+            if record.coefficient == 0:
                 raise ValidationError("The coefficient must not be zero.")

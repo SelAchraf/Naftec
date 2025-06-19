@@ -22,7 +22,7 @@ class ArtecProduction(models.Model):
     )
     
     produced_volume = fields.Float(
-        string='Produced volume [m3]',
+        string='Produced volume [m³]',
         compute='_compute_produced_volume',
         store=True
     )
