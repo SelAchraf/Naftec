@@ -48,27 +48,34 @@
 		<field name="name">Artec Product Kanban View</field>
 		<field name="model">artec.product</field>
 		<field name="arch" type="xml">
-			<kanban>
+			<kanban class="o_kanban_small_column">
 				<field name="name"/>
-                <field name="color"/>
-                <field name="tank_ids"/>
-                <templates>
-                    <t t-name="card">
-                        <div class="oe_kanban_card">
-                            <div class="oe_kanban_content">
-                                <h4><field name="name"/></h4>
-                                <div>
-                                    <strong>Color: </strong> 
-									<field name="color"/>
-                                </div>
-                                <div>
-                                    <strong>Tanks: </strong>
-									<field name="tank_ids" widget="many2many_tags"/>
-                                </div>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
+				<field name="color"/>
+				<field name="tank_ids"/>
+				<templates>
+					<t t-name="kanban-box">
+						<div class="oe_kanban_card oe_kanban_global_click card border-0 shadow-sm h-100" style="background-color: #ffffff; transition: transform 0.2s, box-shadow 0.2s;" t-att-class="'oe_kanban_color_' + record.color.raw_value">
+							<div class="oe_kanban_content p-3 d-flex flex-column">
+								<!-- Header with product name -->
+								<div class="d-flex align-items-center mb-3">
+									<h4 class="mb-0 text-truncate fw-bold fs-2">
+										<field name="name"/>
+									</h4>
+								</div>
+								<!-- Tank tags -->
+								<div class="mt-auto d-flex flex-row align-items-start gap-2">
+									<strong class="text-muted small">Tanks: </strong>
+									<t t-if="record.tank_ids.raw_value.length > 0">
+                                        <field name="tank_ids" widget="many2many_tags" class="mt-1"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="text-muted small">No tanks assigned</span>
+                                    </t>
+								</div>
+							</div>
+						</div>
+					</t>
+				</templates>
 			</kanban>
 		</field>
 	</record>

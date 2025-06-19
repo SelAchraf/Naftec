@@ -14,7 +14,7 @@ class ArtecGauging(models.Model):
         comodel_name='artec.tank',
         string='Tank',
         required=True,
-        domain=[('product_id.name', '=', 'Oil')]
+        domain=lambda self: [('product_id', 'in', [self.env.ref('artec_collect.artec_product_oil').id, False])]    
     )
     
     datetime = fields.Datetime(
@@ -28,7 +28,7 @@ class ArtecGauging(models.Model):
     
     theoretical_volume = fields.Float(
         compute='_compute_theoretical_volume',
-        string='Theoretical Volume [m3]',
+        string='Theoretical Volume [m³]',
         store=True
     )
     
@@ -47,7 +47,7 @@ class ArtecGauging(models.Model):
     )
     
     volume = fields.Float(
-        string='Volume [m3]',
+        string='Volume [m³]',
         compute='_compute_volume',
         store=True
     )

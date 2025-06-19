@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="artec_product_oil" model="artec.product">
+            <field name="name">Oil</field>
+            <field name="color">10</field>
+        </record>
+
+        <record id="artec_product_gas" model="artec.product">
+            <field name="name">Gas</field>
+            <field name="color">2</field>
+        </record>
+
+        <record id="artec_product_water" model="artec.product">
+            <field name="name">Water</field>
+            <field name="color">8</field>
+        </record>
+    </data>
+</odoo>
