@@ -1,6 +1,4 @@
 from odoo import api, fields, models
-from odoo.exceptions import ValidationError
-
 class ArtecTank(models.Model):
     _name = "artec.tank"
     
@@ -15,6 +13,10 @@ class ArtecTank(models.Model):
         required=True
     )
     
+    color = fields.Integer(
+        related='product_id.color'
+    )
+    
     height = fields.Float(
         string='Height [m]',
     )
@@ -25,7 +27,9 @@ class ArtecTank(models.Model):
     
     current_volume = fields.Float(
         compute="_compute_current_volume",
-        store=True
+        string= "Current Volume [m³]",
+        store=True,
+        digits=(16, 2)
     )
     
     capacity = fields.Float(
