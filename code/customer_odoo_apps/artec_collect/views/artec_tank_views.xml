@@ -9,7 +9,7 @@
 				<field name="product_id" />
 				<field name="height" width="150"/>
 				<field name="width" width="150"/>
-				<field name="current_volume" width="200" string="Current Volume [m³]"/>
+				<field name="current_volume" width="200"/>
 				<field name="capacity" width="150"/>
 				<field name="percentage" width="150"/>
 			</list>
@@ -66,7 +66,7 @@
                         <page string="Informations">
                             <group>
 								<field name="product_id"></field>
-								<field name="current_volume" string="Current Volume [m³]"></field>
+								<field name="current_volume"></field>
 								<field name="percentage"></field>
                             </group>
                         </page>
@@ -91,7 +91,7 @@
 				<field name="name"></field>
 				<field name="width"></field>
 				<field name="height"></field>
-				<field name="current_volume" string="Current Volume [m³]"></field>
+				<field name="current_volume"></field>
 				<field name="capacity"></field>
 				<field name="product_id"></field>
 				<field name="strapping_ids"></field>
@@ -110,9 +110,10 @@
 				<field name="height"/>
 				<field name="capacity"/>
 				<field name="product_id"/>
+				<field name="color"/>
 				<templates>
 					<t t-name="kanban-box">
-						<div class="oe_kanban_card oe_kanban_global_click card border-0 shadow-sm h-100" style="background-color: #ffffff; transition: transform 0.2s, box-shadow 0.2s;" t-att-style="'border-left: 4px solid ' + (record.product_id.raw_value.color || '#ffffff')">
+						<div class="oe_kanban_card oe_kanban_global_click card border-0 shadow-sm h-100" style="background-color: #ffffff; transition: transform 0.2s, box-shadow 0.2s;" t-att-class="'oe_kanban_color_' + record.color.raw_value">
 							<div class="oe_kanban_content p-3 d-flex flex-column">
 								<!-- Header with tank name -->
 								<div class="d-flex align-items-center mb-3">
@@ -148,19 +149,21 @@
 											</span>
 										</li>
 										<li class="list-group-item d-flex justify-content-between">
-											Current Volume:
-											<span class="badge bg-primary badge-pill text-white">
-												<field name="current_volume"/> m³
-											</span>
-										</li>
-										<li class="list-group-item d-flex justify-content-between">
 											Capacity:
 											<span class="badge bg-primary badge-pill text-white">
 												<field name="capacity"/> m³
 											</span>
 										</li>										
 									</ul>
-									<field name="current_volume" string="Current Volume" widget="gauge" options="{'max_field': 'capacity'}"/>
+									<field name="current_volume" widget="gauge" options="{'max_field': 'capacity'}"/>
+									<ul class="list-group">
+										<li class="list-group-item d-flex justify-content-between">
+											Percentage:
+											<span class="badge bg-primary badge-pill text-white">
+												<field name="percentage"/> %
+											</span>
+										</li>
+									</ul>
 								</div>
 							</div>
 						</div>
