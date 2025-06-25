@@ -9,5 +9,10 @@
     <menuitem id="artec_astm_menu" name="Astm" parent="artec_collect_menu" action="artec_astm_action"/>
     <menuitem id="artec_expedition_menu" name="Expedition" parent="artec_collect_menu" action="artec_expedition_action"/>
     <menuitem id="artec_production_menu" name="Production" parent="artec_collect_menu" action="artec_production_action"/>
+    <menuitem id="artec_reports_menu" name="Reports" parent="artec_collect_menu"/>
+    <menuitem id="artec_tank_report_menu" name="Tank Report" parent="artec_reports_menu"/>
+    <menuitem id="artec_gauging_report_menu" name="Gauging Report" parent="artec_reports_menu"/>
+    <menuitem id="artec_tank_production_report_menu" name="Tank Production" parent="artec_reports_menu" action="artec_tank_production_report_wizard_action"/>
+    <menuitem id="artec_tank_expedition_report_menu" name="Tank Expedition" parent="artec_reports_menu" action="artec_tank_expedition_report_wizard_action"/>
 
 </odoo>

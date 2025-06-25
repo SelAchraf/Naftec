@@ -17,10 +17,15 @@
         'views/artec_astm_views.xml',
         'views/artec_expedition_views.xml',
         'views/artec_production_views.xml',
+        'wizard/artec_tank_expedition_report_wizard_view.xml',
+        'wizard/artec_tank_production_report_wizard_view.xml',
+        'report/artec_tank_expedition_report.xml',
+        'report/artec_tank_production_report.xml',
         'views/menus.xml',
     ],
     'depends':[
-        'base'
+        'base',
+        'web'
     ],
     'auto_install': True,
     'application': True,
