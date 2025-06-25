@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="artec_tank_expedition_report" name="artec_tank_expedition_report">
+        <t t-call="web.html_container">
+            <t t-call="web.basic_layout">
+                <div class="page p-4">
+                    <!-- Header Section -->
+                    <div class="text-center mb-5">
+                        <h1 class="display-5 fw-bold text-primary">Tank Expedition Report</h1>
+                        <h4 class="text-muted"><t t-esc="date"/></h4>
+                    </div>
+
+                    <!-- Expeditions Table -->
+                    <table class="table table-bordered mt-4">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col" class="text-center">Tank</th>
+                                <th scope="col" class="text-center">Expedited Volume (m³)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="expeditions" t-as="tank">
+                                <tr>
+                                    <td class="text-center"><t t-esc="expeditions[tank]['tank_name']"/></td>
+                                    <td class="text-center"><t t-esc="expeditions[tank]['expedited_volume'] or '0.0'"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <!-- Total Volume -->
+                    <div class="mt-3 text-end">
+                        <h5 class="fw-semibold text-primary">Total Expedited Volume: <span class="text-body"><t t-esc="total_expedited_volume"/> m³</span></h5>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="artec_action_report_tank_expedition" model="ir.actions.report">
+        <field name="name">Tank_Expedition_Report</field>
+        <field name="model">artec.expedition</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">artec_collect.artec_tank_expedition_report</field>
+        <field name="report_file">artec_collect.artec_tank_expedition_report</field>
+    </record>
+
+</odoo>

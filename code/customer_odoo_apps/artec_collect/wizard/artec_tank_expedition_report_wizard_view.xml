@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="artec_tank_expedition_report_wizard_view_form" model="ir.ui.view">
+        <field name="name">Artec Tank Expedition Report Wizard Form View</field>
+        <field name="model">artec.tank.expedition.report.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="date"></field>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_report_tank_expedition"
+                        string="Print Report"
+                        type="object"
+                        class="oe_highlight"
+                    />
+                    <button string="Cancel" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="artec_tank_expedition_report_wizard_action" model="ir.actions.act_window">
+        <field name="name">Date Wizard</field>
+        <field name="res_model">artec.tank.expedition.report.wizard</field>
+        <field name="target">new</field>
+        <field name="view_mode">form</field>
+    </record>
+
+</odoo>
