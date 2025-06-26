@@ -1,2 +1,4 @@
 from . import artec_tank_expedition_report_wizard
 from . import artec_tank_production_report_wizard
+from . import artec_expedition_report_wizard
+from . import artec_production_report_wizard

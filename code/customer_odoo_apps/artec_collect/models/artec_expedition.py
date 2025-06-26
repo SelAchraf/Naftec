@@ -17,7 +17,7 @@ class ArtecExpedition(models.Model):
     )
     
     expedited_volume = fields.Float(
-        string='Expedited Volume [m³]',
+        string='Expedited volume [m³]',
         compute = '_compute_expedited_volume',
         store=True
     )

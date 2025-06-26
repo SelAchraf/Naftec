@@ -19,6 +19,8 @@
         'views/artec_production_views.xml',
         'wizard/artec_tank_expedition_report_wizard_view.xml',
         'wizard/artec_tank_production_report_wizard_view.xml',
+        'wizard/artec_expedition_report_wizard_view.xml',
+        'wizard/artec_production_report_wizard_view.xml',
         'report/artec_tank_expedition_report.xml',
         'report/artec_tank_production_report.xml',
         'views/menus.xml',
