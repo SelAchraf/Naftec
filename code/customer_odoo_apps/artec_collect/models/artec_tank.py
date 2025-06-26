@@ -27,7 +27,7 @@ class ArtecTank(models.Model):
     
     current_volume = fields.Float(
         compute="_compute_current_volume",
-        string= "Current Volume [m³]",
+        string= "Current volume [m³]",
         store=True,
         digits=(16, 2)
     )
