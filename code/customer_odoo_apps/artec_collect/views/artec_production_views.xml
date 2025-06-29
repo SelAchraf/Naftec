@@ -61,10 +61,28 @@
 		</field>
 	</record>
 
+    <record id="artec_production_view_pivot" model="ir.ui.view">
+        <field name="name">Artec Production Pivot View</field>
+        <field name="model">artec.production</field>
+        <field name="arch" type="xml">
+            <pivot string="From production pivot view">
+                <field name="tank_id" type="col"/>
+                <field name="date" type="row" interval="day"/>
+                <field name="produced_volume" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
     <record id="artec_production_action" model="ir.actions.act_window">
         <field name="name">Production</field>
         <field name="res_model">artec.production</field>
         <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="artec_production_reporting_action" model="ir.actions.act_window">
+        <field name="name">Production Reporting</field>
+        <field name="res_model">artec.production</field>
+        <field name="view_mode">pivot</field>
     </record>
 
 </odoo>
