@@ -16,5 +16,9 @@
     <menuitem id="artec_tank_production_report_menu" name="Tank Production" parent="artec_reports_menu" action="artec_tank_production_report_wizard_action"/>
     <menuitem id="artec_expedition_report_menu" name="Expedition" parent="artec_reports_menu" action="artec_expedition_report_wizard_action"/>
     <menuitem id="artec_production_report_menu" name="Production" parent="artec_reports_menu" action="artec_production_report_wizard_action"/>
+    <menuitem id="artec_reporting_menu" name="Reporting" parent="artec_collect_menu"/>
+    <menuitem id="artec_gauging_reporting_menu" name="Gauging" parent="artec_reporting_menu" action="artec_gauging_reporting_action"/>
+    <menuitem id="artec_expedition_reporting_menu" name="Expedition" parent="artec_reporting_menu" action="artec_expedition_reporting_action"/>
+    <menuitem id="artec_production_reporting_menu" name="Production" parent="artec_reporting_menu" action="artec_production_reporting_action"/>
 
 </odoo>
