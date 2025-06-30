@@ -73,6 +73,18 @@
         </field>
     </record>
 
+    <record id="artec_production_view_graph" model="ir.ui.view">
+        <field name="name">Artec Production Graph View</field>
+        <field name="model">artec.production</field>
+        <field name="arch" type="xml">
+            <graph string="From production graph view" type="bar" stacked="0">
+                <field name="date" interval="day"/>
+                <field name="tank_id" />
+                <field name="produced_volume" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
     <record id="artec_production_action" model="ir.actions.act_window">
         <field name="name">Production</field>
         <field name="res_model">artec.production</field>
@@ -82,7 +94,7 @@
     <record id="artec_production_reporting_action" model="ir.actions.act_window">
         <field name="name">Production Reporting</field>
         <field name="res_model">artec.production</field>
-        <field name="view_mode">pivot</field>
+        <field name="view_mode">pivot,graph</field>
     </record>
 
 </odoo>
