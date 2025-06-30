@@ -102,6 +102,18 @@
         </field>
     </record>
 
+    <record id="artec_expedition_view_graph" model="ir.ui.view">
+        <field name="name">Artec Expedition Graph View</field>
+        <field name="model">artec.expedition</field>
+        <field name="arch" type="xml">
+            <graph string="From expedition graph view" type="bar" stacked="0">
+                <field name="end_datetime" interval="day"/>
+                <field name="tank_id" />
+                <field name="expedited_volume" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
     <record id="artec_expedition_action" model="ir.actions.act_window">
 		<field name="name">Expedition</field>
 		<field name="res_model">artec.expedition</field>
@@ -111,7 +123,7 @@
     <record id="artec_expedition_reporting_action" model="ir.actions.act_window">
         <field name="name">Expedition Reporting</field>
         <field name="res_model">artec.expedition</field>
-        <field name="view_mode">pivot</field>
+        <field name="view_mode">pivot,graph</field>
         <field name="domain">[('end_datetime', '!=', False)]</field>
     </record>
 
