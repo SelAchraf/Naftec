@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="artec_strapping_cron_auto_change_active" model="ir.cron">
+        <field name="name">Strappings Status: Automatically change the strappings's status</field>
+        <field name="model_id" ref="model_artec_strapping"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_auto_change_active()</field>
+        <field name="active" eval="True"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now().replace(hour=22, minute=0, second=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+    <record id="artec_astm_cron_auto_change_active" model="ir.cron">
+        <field name="name">ASTMs Status: Automatically change the ASTMs's status</field>
+        <field name="model_id" ref="model_artec_astm"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_auto_change_active()</field>
+        <field name="active" eval="True"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now().replace(hour=22, minute=0, second=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+</odoo>
