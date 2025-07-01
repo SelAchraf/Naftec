@@ -95,6 +95,25 @@ class ArtecAstm(models.Model):
     def action_confirm(self):
         for record in self:
             record.state = 'confirmed'
+            
+    def _cron_auto_change_active(self):
+        active_astm = self.search([
+            ('active', '=', True)
+        ], limit=1)
+
+        new_astm = self.search([
+            ('start_datetime', '<=', fields.Datetime.now()),
+            ('end_datetime', '>=', fields.Datetime.now()),
+            ('active', '=', False)
+        ], limit=1)
+        
+        if active_astm and active_astm.end_datetime and active_astm.end_datetime <= fields.Datetime.now():
+            active_astm.active = False
+        
+        if new_astm:
+            if active_astm and not active_astm.end_datetime:
+                active_astm.end_datetime = new_astm.start_datetime
+            new_astm.active = True
 
 class ArtecAstmLine(models.Model):
     _name="artec.astm.line"
