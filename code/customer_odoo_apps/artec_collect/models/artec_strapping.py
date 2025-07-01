@@ -133,6 +133,30 @@ class ArtecStrapping(models.Model):
     def action_confirm(self):
         for record in self:
             record.state = 'confirmed'
+            
+    def _cron_auto_change_active(self):
+        tanks = self.search([]).mapped('tank_id')
+        
+        for tank in tanks:
+            active_strapping = self.search([
+                ('tank_id', '=', tank.id),
+                ('active', '=', True)
+            ], limit=1)
+
+            new_strapping = self.search([
+                ('tank_id', '=', tank.id),
+                ('start_datetime', '<=', fields.Datetime.now()),
+                ('end_datetime', '>=', fields.Datetime.now()),
+                ('active', '=', False)
+            ], limit=1)
+            
+            if active_strapping and active_strapping.end_datetime and active_strapping.end_datetime <= fields.Datetime.now():
+                active_strapping.active = False
+            
+            if new_strapping:
+                if active_strapping and not active_strapping.end_datetime:
+                    active_strapping.end_datetime = new_strapping.start_datetime
+                new_strapping.active = True
 
 class ArtecStrappingLine(models.Model):
     _name="artec.strapping.line"
